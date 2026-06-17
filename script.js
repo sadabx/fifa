@@ -1,8 +1,5 @@
-const NOW_ET_OFFSET = -4;
 function etNow() {
-  const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc + NOW_ET_OFFSET * 3600000);
+  return new Date();
 }
 
 const TEAMS = [
@@ -57,7 +54,8 @@ const TEAMS = [
 ];
 
 function etDate(y, mo, d, h, m) {
-  const utcMs = Date.UTC(y, mo - 1, d, h - NOW_ET_OFFSET, m, 0, 0);
+  // Times are stored as ET (UTC-4). Convert to UTC for correct Date objects.
+  const utcMs = Date.UTC(y, mo - 1, d, h + 4, m, 0, 0);
   return new Date(utcMs);
 }
 
@@ -1078,14 +1076,12 @@ function renderCountdowns() {
         <div class="cd-unit"><div class="cd-num" data-match="${target.id}" data-unit="s">${String(secs).padStart(2, "0")}</div><div class="cd-label">sec</div></div>
       </div>`;
     }
-    const dateStr =
-      target.date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "America/New_York",
-      }) + " ET";
+    const dateStr = target.date.toLocaleString([], {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     cards.push(`<div class="countdown-card">
       <div class="cd-group">Group ${target.group || target.stage}</div>
       <div class="cd-teams">${t ? t.flag : ""} ${teamName} vs ${oppT ? oppT.flag : ""} ${opponent}</div>
@@ -1150,22 +1146,18 @@ document.addEventListener("click", (e) => {
 });
 
 function formatMatchTime(date) {
-  return (
-    date.toLocaleString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "America/New_York",
-    }) + " ET"
-  );
+  return date.toLocaleString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 function formatDayLabel(date) {
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString([], {
     weekday: "long",
     month: "long",
     day: "numeric",
-    timeZone: "America/New_York",
   });
 }
 
@@ -1219,28 +1211,25 @@ function renderSchedule() {
 
   const dayMap = {};
   upcoming.forEach((m) => {
-    const key = m.date.toLocaleDateString("en-US", {
+    const key = m.date.toLocaleDateString([], {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      timeZone: "America/New_York",
     });
     if (!dayMap[key])
       dayMap[key] = { label: formatDayLabel(m.date), matches: [] };
     dayMap[key].matches.push(m);
   });
   Object.values(dayMap).forEach((day) => {
-    const today = now.toLocaleDateString("en-US", {
+    const today = now.toLocaleDateString([], {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      timeZone: "America/New_York",
     });
-    const dayKey = day.matches[0].date.toLocaleDateString("en-US", {
+    const dayKey = day.matches[0].date.toLocaleDateString([], {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      timeZone: "America/New_York",
     });
     html += `<div class="day-block"><div class="day-header">${day.label}${dayKey === today ? ' <span class="day-tag">Today</span>' : ""}</div>`;
     day.matches.forEach((m) => (html += matchRowHTML(m)));
@@ -1255,11 +1244,10 @@ function renderSchedule() {
     let pastHTML = '<div class="past-separator">Completed matches</div>';
     const pastDays = {};
     past.forEach((m) => {
-      const key = m.date.toLocaleDateString("en-US", {
+      const key = m.date.toLocaleDateString([], {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-        timeZone: "America/New_York",
       });
       if (!pastDays[key])
         pastDays[key] = { label: formatDayLabel(m.date), matches: [] };
