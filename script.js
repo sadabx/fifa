@@ -168,6 +168,7 @@ const MATCHES = [
     away: "Ecuador",
     date: etDate(2026, 6, 14, 19, 0),
     venue: "Lincoln Financial Field, PHI",
+    result: "1-0",
   },
   {
     id: 12,
@@ -177,6 +178,7 @@ const MATCHES = [
     away: "Tunisia",
     date: etDate(2026, 6, 14, 22, 0),
     venue: "Estadio BBVA, Monterrey",
+    result: "5-1",
   },
   {
     id: 13,
@@ -186,6 +188,7 @@ const MATCHES = [
     away: "Cape Verde",
     date: etDate(2026, 6, 15, 12, 0),
     venue: "Mercedes-Benz Stadium, ATL",
+    result: "0-0",
   },
   {
     id: 14,
@@ -195,6 +198,7 @@ const MATCHES = [
     away: "Egypt",
     date: etDate(2026, 6, 15, 15, 0),
     venue: "Lumen Field, Seattle",
+    result: "1-1",
   },
   {
     id: 15,
@@ -204,6 +208,7 @@ const MATCHES = [
     away: "Uruguay",
     date: etDate(2026, 6, 15, 18, 0),
     venue: "Hard Rock Stadium, Miami",
+    result: "1-1",
   },
   {
     id: 16,
@@ -213,6 +218,7 @@ const MATCHES = [
     away: "New Zealand",
     date: etDate(2026, 6, 15, 21, 0),
     venue: "SoFi Stadium, Inglewood",
+    result: "2-2",
   },
   {
     id: 17,
@@ -222,6 +228,7 @@ const MATCHES = [
     away: "Senegal",
     date: etDate(2026, 6, 16, 15, 0),
     venue: "MetLife Stadium, E. Rutherford",
+    result: "3-1",
   },
   {
     id: 18,
@@ -231,6 +238,7 @@ const MATCHES = [
     away: "Norway",
     date: etDate(2026, 6, 16, 18, 0),
     venue: "Gillette Stadium, Foxborough",
+    result: "1-4",
   },
   {
     id: 19,
@@ -240,6 +248,7 @@ const MATCHES = [
     away: "Algeria",
     date: etDate(2026, 6, 16, 21, 0),
     venue: "Arrowhead Stadium, Kansas City",
+    result: "3-0",
   },
   {
     id: 20,
@@ -249,6 +258,7 @@ const MATCHES = [
     away: "Jordan",
     date: etDate(2026, 6, 17, 0, 0),
     venue: "Levi's Stadium, Santa Clara",
+    result: "0-1",
   },
   {
     id: 21,
@@ -1057,7 +1067,7 @@ function renderCountdowns() {
     const status = getMatchStatus(target);
     let timerHTML = "";
     if (status === "live") {
-      timerHTML = `<div class="cd-live"><i class="ti ti-circle-filled" style="font-size:8px"></i> Live now</div>`;
+      timerHTML = `<a href="https://iptv.trionine.xyz/tv/fifa-wc-2026" target="_blank" class="cd-live cd-live-link"><i class="ti ti-circle-filled" style="font-size:8px"></i> Live now</a>`;
     } else if (status === "done") {
       timerHTML = `<div class="cd-done">FT: ${target.result || "Finished"}</div>`;
     } else {
@@ -1186,11 +1196,49 @@ function renderSchedule() {
   const pastContainer = document.getElementById("past-container");
   const pastInner = document.getElementById("past-inner");
 
+  const now = etNow();
+
+  // ── "Results" filter: show all completed matches newest-first ──
+  if (stageFilter === "results") {
+    pastWrapper.style.display = "none";
+    const done = MATCHES.filter((m) => m.result || getMatchStatus(m) === "done")
+      .slice()
+      .reverse();
+
+    if (!done.length) {
+      liveContainer.innerHTML =
+        '<div class="no-matches">No completed matches yet.</div>';
+      return;
+    }
+
+    const dayMap = {};
+    done.forEach((m) => {
+      const key = m.date.toLocaleDateString([], {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+      if (!dayMap[key])
+        dayMap[key] = { label: formatDayLabel(m.date), matches: [] };
+      dayMap[key].matches.push(m);
+    });
+
+    let html = "";
+    Object.values(dayMap).forEach((day) => {
+      html += `<div class="day-block"><div class="day-header">${day.label}</div>`;
+      day.matches.forEach((m) => (html += matchRowHTML(m, true)));
+      html += "</div>";
+    });
+    liveContainer.innerHTML = html;
+    return;
+  }
+
+  // ── Normal filters ─────────────────────────────────────────────
   let filtered =
     stageFilter === "all"
       ? MATCHES
       : MATCHES.filter((m) => m.stage === stageFilter);
-  const now = etNow();
+
   const upcoming = [];
   const live = [];
   const past = [];
@@ -1284,7 +1332,7 @@ function matchRowHTML(m, isPast = false) {
   if (m.result)
     resultCell = `<div class="match-result final">${m.result}</div>`;
   else if (status === "live")
-    resultCell = `<div class="match-result"><span class="cd-live">Live</span></div>`;
+    resultCell = `<div class="match-result"><a href="https://iptv.trionine.xyz/tv/fifa-wc-2026" target="_blank" class="cd-live cd-live-link">${m.liveScore ? m.liveScore + " 🔴" : "Live"}</a></div>`;
   else resultCell = `<div class="match-time">${formatMatchTime(m.date)}</div>`;
   return `<div class="${cls}">
     ${stageLabel}
@@ -1312,3 +1360,116 @@ renderFavChips();
 renderSchedule();
 renderCountdowns();
 setInterval(tickCountdowns, 1000);
+
+// ─── Auto Score Sync (ESPN API) ────────────────────────────────────────────
+const ESPN_NAME_MAP = {
+  "Cote D'Ivoire": "Ivory Coast",
+  "Ivory Coast": "Ivory Coast",
+  "Bosnia-Herzegovina": "Bosnia & Herzegovina",
+  "Turkey": "Türkiye",
+  "Türkiye": "Türkiye",
+  "Czech Republic": "Czechia",
+  "Korea Republic": "South Korea",
+  "South Korea": "South Korea",
+  "Curacao": "Curaçao",
+  "DR Congo": "DR Congo",
+  "Democratic Republic of Congo": "DR Congo",
+  "Congo DR": "DR Congo",
+  "New Zealand": "New Zealand",
+  "Saudi Arabia": "Saudi Arabia",
+  "Cape Verde": "Cape Verde",
+};
+
+function espnName(name) {
+  return ESPN_NAME_MAP[name] || name;
+}
+
+function updateSyncIndicator(ok, time) {
+  const el = document.getElementById("score-sync");
+  if (!el) return;
+  if (ok) {
+    el.textContent = `↻ ${time}`;
+    el.className = "score-sync score-sync--ok";
+    el.title = "Scores synced from ESPN";
+  } else {
+    el.textContent = "⚠ sync failed";
+    el.className = "score-sync score-sync--err";
+    el.title = "Score sync failed – showing cached data";
+  }
+}
+
+async function fetchScores() {
+  const LEAGUE = "fifa.world";
+  // Fetch a wide range covering the whole tournament
+  const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${LEAGUE}/scoreboard?limit=100&dates=20260611-20260719`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    let changed = false;
+
+    (data.events || []).forEach((event) => {
+      const comp = event.competitions?.[0];
+      if (!comp) return;
+
+      const isCompleted = comp.status?.type?.completed === true;
+      const isLive = comp.status?.type?.state === "in";
+
+      const homeComp = comp.competitors?.find((c) => c.homeAway === "home");
+      const awayComp = comp.competitors?.find((c) => c.homeAway === "away");
+      if (!homeComp || !awayComp) return;
+
+      const homeName = espnName(homeComp.team.displayName);
+      const awayName = espnName(awayComp.team.displayName);
+
+      const match = MATCHES.find(
+        (m) =>
+          (m.home === homeName && m.away === awayName) ||
+          (m.home === awayName && m.away === homeName),
+      );
+      if (!match) return;
+
+      const hScore = homeComp.score ?? "";
+      const aScore = awayComp.score ?? "";
+
+      if (isCompleted && hScore !== "" && aScore !== "") {
+        const result =
+          match.home === homeName
+            ? `${hScore}-${aScore}`
+            : `${aScore}-${hScore}`;
+        if (match.result !== result) {
+          match.result = result;
+          delete match.liveScore;
+          changed = true;
+        }
+      } else if (isLive && hScore !== "" && aScore !== "") {
+        const liveScore =
+          match.home === homeName
+            ? `${hScore}-${aScore}`
+            : `${aScore}-${hScore}`;
+        if (match.liveScore !== liveScore) {
+          match.liveScore = liveScore;
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      renderSchedule();
+      renderCountdowns();
+    }
+
+    const now = new Date();
+    updateSyncIndicator(
+      true,
+      now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    );
+  } catch (err) {
+    console.warn("[score-sync] fetch failed:", err);
+    updateSyncIndicator(false);
+  }
+}
+
+// Run immediately, then every 60 seconds
+fetchScores();
+setInterval(fetchScores, 60000);

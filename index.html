@@ -1,104 +1,94 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FIFA World Cup 2026 – Schedule & Countdown</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="app-container">
-      <!-- LEFT: Schedule -->
-      <div class="main-panel">
-        <div class="wc-header">
-          <div class="wc-title">
-            <i class="ti ti-trophy" aria-hidden="true"></i>
-            <h1>FIFA World Cup 2026</h1>
-            <span class="wc-badge">In Progress</span>
-          </div>
-          <span class="wc-subtitle">Jun 11 – Jul 19 · USA, CAN, MEX</span>
-        </div>
 
-        <div class="schedule-filters">
-          <span class="filter-label">Stage:</span>
-          <button
-            class="filter-btn active"
-            onclick="setStageFilter('all', this)"
-          >
-            All
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('Group', this)">
-            Group
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('R32', this)">
-            Round of 32
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('R16', this)">
-            Round of 16
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('QF', this)">
-            Quarters
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('SF', this)">
-            Semis
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('Final', this)">
-            Final
-          </button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIFA World Cup 2026 – Schedule & Countdown</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- LEFT: Schedule -->
+    <div class="main-panel">
+      <div class="wc-header">
+        <div class="wc-title">
+          <i class="ti ti-trophy" aria-hidden="true"></i>
+          <h1>FIFA World Cup 2026</h1>
+          <span class="wc-badge">In Progress</span>
         </div>
-        <div id="schedule-live"></div>
-        <div id="past-wrapper" style="display: none">
-          <button
-            class="past-toggle-btn"
-            id="past-toggle"
-            onclick="togglePast()"
-          >
-            Completed matches
-            <span class="chevron"><i class="ti ti-chevron-down"></i></span>
-          </button>
-          <div class="past-container" id="past-container">
-            <div class="past-inner" id="past-inner"></div>
-          </div>
-        </div>
+        <span class="wc-subtitle">Jun 11 – Jul 19 · USA, CAN, MEX</span>
+        <span id="score-sync" class="score-sync" title="Scores auto-sync status">⟳ syncing…</span>
       </div>
 
-      <!-- RIGHT: Countdown & Team Picker -->
-      <div class="side-panel">
-        <div class="fav-bar">
-          <div class="fav-bar-top"><p>Favourite teams</p></div>
-          <div class="fav-chips" id="fav-chips">
-            <span class="no-favs">No teams selected. Search below to add.</span>
-          </div>
+      <div class="schedule-filters">
+        <span class="filter-label">Stage:</span>
+        <button class="filter-btn active" onclick="setStageFilter('all', this)">
+          All
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('Group', this)">
+          Group
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('R32', this)">
+          Round of 32
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('R16', this)">
+          Round of 16
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('QF', this)">
+          Quarters
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('SF', this)">
+          Semis
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('Final', this)">
+          Final
+        </button>
+        <button class="filter-btn" onclick="setStageFilter('results', this)">
+          Results
+        </button>
+      </div>
+      <div id="schedule-live"></div>
+      <div id="past-wrapper" style="display: none">
+        <button class="past-toggle-btn" id="past-toggle" onclick="togglePast()">
+          Completed matches
+          <span class="chevron"><i class="ti ti-chevron-down"></i></span>
+        </button>
+        <div class="past-container" id="past-container">
+          <div class="past-inner" id="past-inner"></div>
         </div>
-        <div class="team-picker">
-          <span class="team-picker-label">Search and add a team</span>
-          <div class="team-search-wrap">
-            <i class="ti ti-search team-search-icon" aria-hidden="true"></i>
-            <input
-              type="text"
-              id="team-search"
-              placeholder="e.g. Brazil, England…"
-              autocomplete="off"
-              oninput="filterTeams(this.value)"
-              onfocus="openDropdown()"
-            />
-            <div class="team-dropdown" id="team-dropdown"></div>
-          </div>
-        </div>
-        <div id="countdown-grid" class="countdown-grid"></div>
       </div>
     </div>
 
-    <script src="script.js" defer></script>
-  </body>
+    <!-- RIGHT: Countdown & Team Picker -->
+    <div class="side-panel">
+      <div class="fav-bar">
+        <div class="fav-bar-top">
+          <p>Favourite teams</p>
+        </div>
+        <div class="fav-chips" id="fav-chips">
+          <span class="no-favs">No teams selected. Search below to add.</span>
+        </div>
+      </div>
+      <div class="team-picker">
+        <span class="team-picker-label">Search and add a team</span>
+        <div class="team-search-wrap">
+          <i class="ti ti-search team-search-icon" aria-hidden="true"></i>
+          <input type="text" id="team-search" placeholder="e.g. Brazil, England…" autocomplete="off"
+            oninput="filterTeams(this.value)" onfocus="openDropdown()" />
+          <div class="team-dropdown" id="team-dropdown"></div>
+        </div>
+      </div>
+      <div id="countdown-grid" class="countdown-grid"></div>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+
 </html>

@@ -474,6 +474,15 @@ display: inline-block;
 margin-bottom: 8px;
 font-weight: 500;
 }
+.cd-live-link {
+text-decoration: none;
+cursor: pointer;
+transition: filter 0.15s, background 0.15s;
+}
+.cd-live-link:hover {
+filter: brightness(1.2);
+background: rgba(231, 76, 60, 0.18);
+}
 .cd-done {
 color: var(--color-text-secondary);
 font-size: 0.8rem;
@@ -501,4 +510,29 @@ padding: 2rem;
 text-align: center;
 color: var(--color-text-secondary);
 font-size: 0.9rem;
+}
+
+/* Score sync indicator */
+.score-sync {
+font-size: 0.68rem;
+padding: 2px 8px;
+border-radius: 20px;
+font-weight: 500;
+letter-spacing: 0.01em;
+color: var(--color-text-tertiary);
+background: var(--color-background-tertiary);
+border: 0.5px solid var(--color-border-primary);
+cursor: default;
+transition: color 0.3s, background 0.3s;
+white-space: nowrap;
+}
+.score-sync--ok {
+color: var(--wc-green);
+background: rgba(29, 158, 117, 0.07);
+border-color: rgba(29, 158, 117, 0.2);
+}
+.score-sync--err {
+color: #c0392b;
+background: rgba(192, 57, 43, 0.07);
+border-color: rgba(192, 57, 43, 0.2);
 }
