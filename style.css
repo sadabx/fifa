@@ -420,6 +420,7 @@ display: flex;
 flex-direction: column;
 gap: 12px;
 }
+
 .countdown-card {
 background: var(--color-background-primary);
 border: 0.5px solid var(--color-border-tertiary);
@@ -535,4 +536,61 @@ border-color: rgba(29, 158, 117, 0.2);
 color: #c0392b;
 background: rgba(192, 57, 43, 0.07);
 border-color: rgba(192, 57, 43, 0.2);
+}
+
+
+/* ── Mobile favourite team banner (between header & filters) ── */
+.mobile-fav-banner {
+display: none; /* hidden by default; shown only on mobile */
+}
+@media (max-width: 900px) {
+.mobile-fav-banner.has-content {
+    display: block;
+    margin-bottom: 1rem;
+}
+.mobile-fav-banner .countdown-card {
+    background: linear-gradient(135deg, rgba(29, 158, 117, 0.08) 0%, rgba(17, 23, 32, 0.6) 100%);
+    border: 1px solid rgba(29, 158, 117, 0.25);
+    border-radius: var(--border-radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.mobile-fav-banner .countdown-card:hover {
+    border-color: rgba(29, 158, 117, 0.4);
+}
+.mobile-fav-banner .cd-group {
+    display: none; /* keep it compact on mobile */
+}
+.mobile-fav-banner .cd-teams {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0;
+}
+.mobile-fav-banner .cd-meta {
+    font-size: 0.68rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: 0;
+    flex-basis: 100%;
+}
+.mobile-fav-banner .cd-timer {
+    gap: 4px;
+}
+.mobile-fav-banner .cd-num {
+    font-size: 1.1rem;
+}
+.mobile-fav-banner .cd-label {
+    font-size: 0.55rem;
+}
+.mobile-fav-banner .cd-colon {
+    font-size: 1rem;
+}
+.mobile-fav-banner .cd-done,
+.mobile-fav-banner .cd-live {
+    margin-bottom: 0;
+}
 }

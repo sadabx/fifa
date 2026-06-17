@@ -1041,9 +1041,12 @@ function getMatchStatus(m) {
 
 function renderCountdowns() {
   const grid = document.getElementById("countdown-grid");
+  const banner = document.getElementById("mobile-fav-banner");
+
   if (!favorites.length) {
     grid.innerHTML =
       '<div class="empty-countdown"><i class="ti ti-heart" style="font-size:24px;display:block;margin-bottom:8px;color:var(--color-text-tertiary)"></i>Select teams to see countdowns.</div>';
+    if (banner) { banner.innerHTML = ""; banner.classList.remove("has-content"); }
     return;
   }
   const now = etNow();
@@ -1099,9 +1102,21 @@ function renderCountdowns() {
       ${timerHTML}
     </div>`);
   });
+
   grid.innerHTML =
     cards.join("") ||
     '<div class="empty-countdown">No upcoming matches found.</div>';
+
+  // Mobile banner: show only the first favourite team's card
+  if (banner) {
+    if (cards.length) {
+      banner.innerHTML = cards[0];
+      banner.classList.add("has-content");
+    } else {
+      banner.innerHTML = "";
+      banner.classList.remove("has-content");
+    }
+  }
 }
 
 function tickCountdowns() {
