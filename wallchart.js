@@ -344,6 +344,9 @@
 
     // Attach score handlers
     attachScoreHandlers();
+
+    // Dynamically scale/fit the bracket to the viewport
+    fitBracket();
   }
 
   function renderHalf(side) {
@@ -415,18 +418,20 @@
 
     return `
     <div class="bracket-center">
-      <div class="center-connector left-conn"></div>
-      <div class="center-connector right-conn"></div>
-      <div class="final-section">
-        <div class="trophy-display">🏆</div>
-        <div class="final-label">Final</div>
-        ${renderMatchCard(BRACKET_LAYOUT.final)}
-        <div class="winner-display">
-          <div class="wd-label">🏆 World Champion</div>
-          ${winnerFlag ? `<span class="wd-flag">${winnerFlag}</span>` : ""}
-          <div class="wd-team">${isPlaceholder(winnerName) ? '<span class="wd-tbd">TBD</span>' : winnerName}</div>
-        </div>
+      <div class="trophy-display">🏆</div>
+      
+      <div class="winner-display">
+        <div class="wd-label">🏆 World Champion</div>
+        ${winnerFlag ? `<span class="wd-flag">${winnerFlag}</span>` : ""}
+        ${!isPlaceholder(winnerName) && winnerName !== "?" ? `<div class="wd-team">${winnerName}</div>` : ""}
       </div>
+      
+      <div class="final-match-container">
+        <div class="center-connector left-conn"></div>
+        <div class="center-connector right-conn"></div>
+        ${renderMatchCard(BRACKET_LAYOUT.final)}
+      </div>
+      
       <div class="third-section">
         <div class="third-label">Third Place Match</div>
         ${renderMatchCard(BRACKET_LAYOUT.third)}
@@ -594,4 +599,66 @@
     renderBracket();
   }
   window.syncWallchart = syncWallchart;
+
+  // ── Auto Scaling and Responsiveness ─────────────────────────────────────
+  function fitBracket() {
+    const view = document.getElementById('bracket-view');
+    const wrapper = view ? view.querySelector('.bracket-wrapper') : null;
+    if (!view || !wrapper) return;
+
+    // Check if mobile portrait mode
+    const isMobilePortrait = window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches;
+    if (isMobilePortrait) {
+      wrapper.style.transform = '';
+      wrapper.style.transformOrigin = '';
+      view.style.height = '';
+      view.style.overflow = '';
+      return;
+    }
+
+    // Reset transform to get baseline measurements
+    wrapper.style.transform = 'none';
+    wrapper.style.transformOrigin = '';
+    view.style.height = '';
+    view.style.overflow = '';
+
+    const viewRect = view.getBoundingClientRect();
+    const wrapperWidth = wrapper.offsetWidth || 1200;
+    const wrapperHeight = wrapper.offsetHeight || 620;
+
+    if (wrapperWidth === 0 || wrapperHeight === 0) return;
+
+    const availWidth = viewRect.width || view.offsetWidth;
+    const availHeight = window.innerHeight - viewRect.top - 20;
+
+    // Scale to fit the constraints of the window viewport
+    let scale = Math.min(availWidth / wrapperWidth, availHeight / wrapperHeight);
+
+    // Apply boundary constraints (min 0.3x, max 2.0x)
+    scale = Math.min(scale, 2.0);
+    scale = Math.max(scale, 0.3);
+
+    // Apply scale transform and center origin top
+    wrapper.style.transform = `scale(${scale})`;
+    wrapper.style.transformOrigin = 'center top';
+
+    // Update parent view container height to match scaled height
+    view.style.height = `${wrapperHeight * scale}px`;
+    view.style.overflow = 'hidden';
+  }
+
+  // Attach global event listeners
+  window.addEventListener('resize', fitBracket);
+  window.addEventListener('load', fitBracket);
+
+  // Intercept tab switching to ensure the bracket gets refit when switching back
+  if (typeof window.switchView === 'function') {
+    const originalSwitchView = window.switchView;
+    window.switchView = function(view, btn) {
+      originalSwitchView(view, btn);
+      if (view === 'bracket') {
+        setTimeout(fitBracket, 50);
+      }
+    };
+  }
 })();

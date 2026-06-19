@@ -988,9 +988,21 @@ body {
 
 /* Bracket */
 
-.bracket-view {
-    padding: 20px 0;
+#view-bracket .wallchart-app {
+    max-width: none;
     width: 100%;
+    margin: 0;
+}
+
+.bracket-view {
+    padding: 10px 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .bracket-view::-webkit-scrollbar {
@@ -1010,14 +1022,21 @@ body {
 .bracket-wrapper {
     display: flex;
     align-items: center;
-    width: 100%;
+    width: 1200px;
+    min-width: 1200px;
+    height: 620px;
+    min-height: 620px;
     padding: 20px 0;
+    flex-shrink: 0;
 }
 
 .bracket-half {
     display: flex;
-    flex: 1;
+    flex: none;
+    width: 450px;
+    min-width: 450px;
     align-items: stretch;
+    justify-content: space-between;
 }
 
 .bracket-half.left {
@@ -1033,22 +1052,9 @@ body {
     flex-direction: column;
     justify-content: space-around;
     position: relative;
-}
-
-.round-col.r32 {
-    flex: 1.1;
-}
-
-.round-col.r16 {
-    flex: 1;
-}
-
-.round-col.qf {
-    flex: 1;
-}
-
-.round-col.sf {
-    flex: 1;
+    width: 100px;
+    min-width: 100px;
+    flex: none;
 }
 
 .round-label {
@@ -1242,21 +1248,32 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex: 1.2;
+    width: 300px;
+    min-width: 300px;
+    height: 100%;
+    flex: none;
     padding: 0 8px;
     position: relative;
 }
 
-.final-section {
+.final-match-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 130px;
+    height: 46px;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 8px;
 }
 
 .trophy-display {
+    position: absolute;
+    bottom: calc(50% + 95px);
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 2.2rem;
-    margin-bottom: 2px;
     filter: drop-shadow(0 4px 12px rgba(201, 162, 39, 0.3));
     animation: trophy-glow 3s ease-in-out infinite alternate;
 }
@@ -1271,23 +1288,18 @@ body {
     }
 }
 
-.final-label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: var(--wc-gold);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-}
-
 .winner-display {
+    position: absolute;
+    bottom: calc(50% + 35px);
+    left: 50%;
+    transform: translateX(-50%);
     background: linear-gradient(135deg, rgba(186, 117, 23, 0.12), rgba(186, 117, 23, 0.04));
     border: 2px solid var(--wc-gold);
     border-radius: var(--border-radius-md);
-    padding: 10px 16px;
+    padding: 8px 12px;
     text-align: center;
-    width: 100%;
-    max-width: 160px;
+    width: 140px;
+    max-width: 140px;
 }
 
 .winner-display .wd-label {
@@ -1319,11 +1331,21 @@ body {
 }
 
 .third-section {
-    margin-top: 12px;
+    position: absolute;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
     padding-top: 12px;
     border-top: 0.5px solid var(--color-border-primary);
-    text-align: center;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.third-section .match-card {
+    max-width: 130px;
+    width: 130px;
 }
 
 .third-label {
@@ -1337,30 +1359,32 @@ body {
 .center-connector {
     position: absolute;
     top: 50%;
-    width: 15px;
-    height: 0;
-    border-top: 2px solid var(--connector);
+    transform: translateY(-50%);
+    width: 85px;
+    height: 2px;
+    background-color: var(--connector);
 }
 
 .center-connector.left-conn {
-    left: 0;
+    right: 100%;
 }
 
 .center-connector.right-conn {
-    right: 0;
+    left: 100%;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    MOBILE ROTATED BRACKET
    ══════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 700px) {
+@media (max-width: 700px) and (orientation: portrait) {
     .bracket-view {
         overflow: auto !important;
-        height: 1150px;
-        /* height to accommodate the 1100px rotated width of the bracket */
+        height: 1250px;
+        /* height to accommodate the 1200px rotated width of the bracket */
         width: 100%;
         position: relative;
         -webkit-overflow-scrolling: touch;
+        display: block !important;
     }
 
     .bracket-wrapper {
@@ -1369,9 +1393,10 @@ body {
         position: absolute;
         top: 0;
         left: 0;
-        width: 1100px;
+        width: 1200px;
         height: 100vw;
         /* rotated height fits mobile viewport width */
-        min-width: 1100px !important;
+        min-width: 1200px !important;
+        min-height: 0 !important;
     }
 }
