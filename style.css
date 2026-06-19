@@ -84,6 +84,7 @@ body {
     .side-panel {
         position: static;
         max-height: none;
+        order: -1;
     }
 }
 
@@ -987,11 +988,13 @@ body {
 .gm-input::-webkit-inner-spin-button,
 .gm-input::-webkit-outer-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 .gm-input[type="number"] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .gm-dash {
@@ -1181,11 +1184,13 @@ body {
 .score-input::-webkit-inner-spin-button,
 .score-input::-webkit-outer-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 .score-input[type="number"] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .match-date {
