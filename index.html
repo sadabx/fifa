@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FIFA World Cup 2026 – Schedule & Countdown</title>
+    <title>FIFA World Cup 2026 – Schedule, Countdown &amp; Wallchart</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -19,102 +19,178 @@
   </head>
 
   <body>
-    <div class="app-container">
-      <!-- LEFT: Schedule -->
-      <div class="main-panel">
-        <div class="wc-header">
-          <div class="wc-title">
-            <i class="ti ti-trophy" aria-hidden="true"></i>
-            <h1>FIFA World Cup 2026</h1>
-            <span class="wc-badge">In Progress</span>
+    <!-- ── Top-level view switcher ── -->
+    <nav class="view-nav" id="view-nav">
+      <button
+        class="view-tab active"
+        id="view-tab-schedule"
+        onclick="switchView('schedule', this)"
+      >
+        <i class="ti ti-calendar-event"></i> Schedule
+      </button>
+      <button
+        class="view-tab"
+        id="view-tab-groups"
+        onclick="switchView('groups', this)"
+      >
+        <i class="ti ti-table"></i> Group Standings
+      </button>
+      <button
+        class="view-tab"
+        id="view-tab-bracket"
+        onclick="switchView('bracket', this)"
+      >
+        <i class="ti ti-route-alt-left"></i> Knockout Bracket
+      </button>
+    </nav>
+
+    <!-- ── Schedule view ── -->
+    <div id="view-schedule" class="top-view active">
+      <div class="app-container">
+        <!-- LEFT: Schedule -->
+        <div class="main-panel">
+          <div class="wc-header">
+            <div class="wc-title">
+              <i class="ti ti-trophy" aria-hidden="true"></i>
+              <h1>FIFA World Cup 2026</h1>
+              <span class="wc-badge">In Progress</span>
+            </div>
+            <span class="wc-subtitle">Jun 11 – Jul 19 · USA, CAN, MEX</span>
+            <span
+              id="score-sync"
+              class="score-sync"
+              title="Scores auto-sync status"
+              >⟳ syncing…</span
+            >
           </div>
-          <span class="wc-subtitle">Jun 11 – Jul 19 · USA, CAN, MEX</span>
-          <span
-            id="score-sync"
-            class="score-sync"
-            title="Scores auto-sync status"
-            >⟳ syncing…</span
-          >
+
+          <!-- Mobile only: first favourite team countdown banner -->
+          <div id="mobile-fav-banner" class="mobile-fav-banner"></div>
+
+          <div class="schedule-filters">
+            <span class="filter-label">Stage:</span>
+            <button
+              class="filter-btn active"
+              onclick="setStageFilter('all', this)"
+            >
+              All
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('Group', this)">
+              Group
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('R32', this)">
+              Round of 32
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('R16', this)">
+              Round of 16
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('QF', this)">
+              Quarters
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('SF', this)">
+              Semis
+            </button>
+            <button class="filter-btn" onclick="setStageFilter('Final', this)">
+              Final
+            </button>
+            <button
+              class="filter-btn"
+              onclick="setStageFilter('results', this)"
+            >
+              Results
+            </button>
+          </div>
+          <div id="schedule-live"></div>
+          <div id="past-wrapper" style="display: none">
+            <button
+              class="past-toggle-btn"
+              id="past-toggle"
+              onclick="togglePast()"
+            >
+              Completed matches
+              <span class="chevron"><i class="ti ti-chevron-down"></i></span>
+            </button>
+            <div class="past-container" id="past-container">
+              <div class="past-inner" id="past-inner"></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Mobile only: first favourite team countdown banner -->
-        <div id="mobile-fav-banner" class="mobile-fav-banner"></div>
-
-        <div class="schedule-filters">
-          <span class="filter-label">Stage:</span>
-          <button
-            class="filter-btn active"
-            onclick="setStageFilter('all', this)"
-          >
-            All
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('Group', this)">
-            Group
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('R32', this)">
-            Round of 32
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('R16', this)">
-            Round of 16
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('QF', this)">
-            Quarters
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('SF', this)">
-            Semis
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('Final', this)">
-            Final
-          </button>
-          <button class="filter-btn" onclick="setStageFilter('results', this)">
-            Results
-          </button>
-        </div>
-        <div id="schedule-live"></div>
-        <div id="past-wrapper" style="display: none">
-          <button
-            class="past-toggle-btn"
-            id="past-toggle"
-            onclick="togglePast()"
-          >
-            Completed matches
-            <span class="chevron"><i class="ti ti-chevron-down"></i></span>
-          </button>
-          <div class="past-container" id="past-container">
-            <div class="past-inner" id="past-inner"></div>
+        <!-- RIGHT: Countdown & Team Picker -->
+        <div class="side-panel">
+          <div class="fav-bar">
+            <div class="fav-bar-top">
+              <p>Favourite teams</p>
+            </div>
+            <div class="fav-chips" id="fav-chips">
+              <span class="no-favs"
+                >No teams selected. Search below to add.</span
+              >
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- RIGHT: Countdown & Team Picker -->
-      <div class="side-panel">
-        <div class="fav-bar">
-          <div class="fav-bar-top">
-            <p>Favourite teams</p>
+          <div class="team-picker">
+            <span class="team-picker-label">Search and add a team</span>
+            <div class="team-search-wrap">
+              <i class="ti ti-search team-search-icon" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="team-search"
+                placeholder="e.g. Brazil, England…"
+                autocomplete="off"
+                oninput="filterTeams(this.value)"
+                onfocus="openDropdown()"
+              />
+              <div class="team-dropdown" id="team-dropdown"></div>
+            </div>
           </div>
-          <div class="fav-chips" id="fav-chips">
-            <span class="no-favs">No teams selected. Search below to add.</span>
-          </div>
+          <div id="countdown-grid" class="countdown-grid"></div>
         </div>
-        <div class="team-picker">
-          <span class="team-picker-label">Search and add a team</span>
-          <div class="team-search-wrap">
-            <i class="ti ti-search team-search-icon" aria-hidden="true"></i>
-            <input
-              type="text"
-              id="team-search"
-              placeholder="e.g. Brazil, England…"
-              autocomplete="off"
-              oninput="filterTeams(this.value)"
-              onfocus="openDropdown()"
-            />
-            <div class="team-dropdown" id="team-dropdown"></div>
-          </div>
-        </div>
-        <div id="countdown-grid" class="countdown-grid"></div>
       </div>
     </div>
+    <!-- /view-schedule -->
 
+    <!-- ── Group Standings view ── -->
+    <div id="view-groups" class="top-view wallchart-outer">
+      <div class="wallchart-app" id="wallchart-inner">
+        <div id="groups-grid" class="groups-grid"></div>
+      </div>
+    </div>
+    <!-- /view-groups -->
+
+    <!-- ── Knockout Bracket view ── -->
+    <div id="view-bracket" class="top-view wallchart-outer">
+      <div class="wallchart-app">
+        <div id="bracket-view" class="bracket-view"></div>
+      </div>
+    </div>
+    <!-- /view-bracket -->
+
+    <script src="data.js" defer></script>
     <script src="script.js" defer></script>
+    <script src="wallchart.js" defer></script>
+    <script>
+      function switchView(view, btn) {
+        document
+          .querySelectorAll(".view-tab")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document
+          .querySelectorAll(".top-view")
+          .forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-" + view).classList.add("active");
+        try {
+          localStorage.setItem("fifa_view", view);
+        } catch (e) {}
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        try {
+          const saved = localStorage.getItem("fifa_view");
+          if (saved === "groups" || saved === "bracket") {
+            const btn = document.getElementById("view-tab-" + saved);
+            if (btn) switchView(saved, btn);
+          }
+        } catch (e) {}
+      });
+    </script>
   </body>
 </html>
