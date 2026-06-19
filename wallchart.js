@@ -421,7 +421,7 @@
       <div class="trophy-display">🏆</div>
       
       <div class="winner-display">
-        <div class="wd-label">🏆 World Champion</div>
+        <div class="wd-label">World Champion</div>
         ${winnerFlag ? `<span class="wd-flag">${winnerFlag}</span>` : ""}
         ${!isPlaceholder(winnerName) && winnerName !== "?" ? `<div class="wd-team">${winnerName}</div>` : ""}
       </div>
@@ -654,7 +654,7 @@
   // Intercept tab switching to ensure the bracket gets refit when switching back
   if (typeof window.switchView === 'function') {
     const originalSwitchView = window.switchView;
-    window.switchView = function(view, btn) {
+    window.switchView = function (view, btn) {
       originalSwitchView(view, btn);
       if (view === 'bracket') {
         setTimeout(fitBracket, 50);
