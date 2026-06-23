@@ -9,7 +9,7 @@ let pastExpanded = false;
 function saveFavs() {
   try {
     localStorage.setItem("wc26_favs", JSON.stringify(favorites));
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function addFav(name) {
@@ -86,7 +86,7 @@ function renderCountdowns() {
     const status = getMatchStatus(target);
     let timerHTML = "";
     if (status === "live") {
-      timerHTML = `<a href="https://iptv.trionine.xyz/tv/fifa-wc-2026" target="_blank" class="cd-live cd-live-link"><i class="ti ti-circle-filled" style="font-size:8px"></i> Live now</a>`;
+      timerHTML = `<a href="https://iptv.trionine.xyz/sports/fifa-live" target="_blank" class="cd-live cd-live-link"><i class="ti ti-circle-filled" style="font-size:8px"></i> Live now</a>`;
     } else if (status === "done") {
       timerHTML = `<div class="cd-done">FT: ${target.result || "Finished"}</div>`;
     } else {
@@ -363,7 +363,7 @@ function matchRowHTML(m, isPast = false) {
   if (m.result)
     resultCell = `<div class="match-result final">${m.result}</div>`;
   else if (status === "live")
-    resultCell = `<div class="match-result"><a href="https://iptv.trionine.xyz/tv/fifa-wc-2026" target="_blank" class="cd-live cd-live-link">${m.liveScore ? m.liveScore + " 🔴" : "Live"}</a></div>`;
+    resultCell = `<div class="match-result"><a href="https://iptv.trionine.xyz/sports/fifa-live" target="_blank" class="cd-live cd-live-link">${m.liveScore ? m.liveScore + " 🔴" : "Live"}</a></div>`;
   else resultCell = `<div class="match-time">${formatMatchTime(m.date)}</div>`;
   return `<div class="${cls}">
     ${stageLabel}

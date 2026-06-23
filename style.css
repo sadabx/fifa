@@ -1418,3 +1418,149 @@ body {
         min-height: 0 !important;
     }
 }
+
+/* ==========================================================================
+   SITE FOOTER (F1DASH style)
+   ========================================================================== */
+.site-footer {
+  background: #0e0e0e;
+  border-top: 1px solid var(--color-border-primary);
+  padding: 40px 20px 28px;
+  margin-top: 48px;
+  position: relative;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 1280px;
+  box-sizing: border-box;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--wc-green), transparent);
+  opacity: 0.8;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 3fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Brand column */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: baseline;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.footer-logo .logo-tn {
+  color: var(--wc-green); /* FIFA green accent */
+}
+
+.footer-logo .logo-tv {
+  color: var(--color-text-primary);
+}
+
+.footer-tagline {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-dev {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.footer-dev a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+
+.footer-dev a:hover {
+  color: var(--wc-green);
+}
+
+/* Link columns */
+.footer-links,
+.footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-col-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.footer-links a {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+  width: fit-content;
+}
+
+.footer-links a:hover {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.footer-note {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-family: monospace;
+  margin-top: 4px;
+}
+
+/* Footer mobile */
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
