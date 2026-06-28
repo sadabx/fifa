@@ -94,9 +94,8 @@
     "Runner-up L": { match: 83, slot: "away" },
   };
 
-  // ── State ───────────────────────────────────────────────────────────────
-
-  let matchState = {};
+  window.matchState = window.matchState || {};
+  const matchState = window.matchState;
   let expandedGroup = null;
 
   // ── Utilities ───────────────────────────────────────────────────────────
@@ -330,6 +329,106 @@
         matchState[match][slot] = second.name;
       }
     });
+  }
+
+  function autoFillKnockouts() {
+    // Propagate winners sequentially: R32 (73-88) -> R16 (89-96) -> QF (97-100) -> SF (101-102)
+    for (let id = 73; id <= 102; id++) {
+      const st = matchState[id];
+      if (st && st.result) {
+        const h = st.homeScore;
+        const a = st.awayScore;
+        if (h !== null && a !== null && h !== a) {
+          const winner = h > a ? st.home : st.away;
+          const loser = h > a ? st.away : st.home;
+          const adv = ADVANCE[id];
+          if (adv) {
+            matchState[adv.match][adv.slot] = winner;
+          }
+          if (adv && adv.loser) {
+            matchState[adv.loser.match][adv.loser.slot] = loser;
+          }
+        }
+      }
+    }
+  }
+
+  function getBestThirds() {
+    const letters = "ABCDEFGHIJKL".split("");
+    const thirds = [];
+    letters.forEach((letter) => {
+      const standings = calculateGroupStandings(letter);
+      if (standings.length >= 3) {
+        thirds.push({
+          name: standings[2].name,
+          flag: standings[2].flag,
+          group: letter,
+          pts: standings[2].pts,
+          gd: standings[2].gd,
+          gf: standings[2].gf
+        });
+      }
+    });
+
+    thirds.sort((a, b) => {
+      return b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.group.localeCompare(b.group);
+    });
+
+    return thirds;
+  }
+
+  function findValidPermutation(winnerGroups, qualifiedThirds) {
+    const n = winnerGroups.length;
+    const p = [];
+    const used = new Array(n).fill(false);
+
+    function backtrack(idx) {
+      if (idx === n) {
+        return true;
+      }
+      for (let i = 0; i < n; i++) {
+        if (!used[i]) {
+          if (qualifiedThirds[i].group !== winnerGroups[idx]) {
+            p.push(i);
+            used[i] = true;
+            if (backtrack(idx + 1)) return true;
+            used[i] = false;
+            p.pop();
+          }
+        }
+      }
+      return false;
+    }
+
+    if (backtrack(0)) {
+      return p;
+    }
+    return null;
+  }
+
+  function autoFillBestThirds() {
+    const thirds = getBestThirds();
+    if (thirds.length < 8) return;
+
+    const qualified = thirds.slice(0, 8);
+    const groupWinners = [
+      { group: "A", match: 79, slot: "away" },
+      { group: "B", match: 85, slot: "away" },
+      { group: "D", match: 81, slot: "away" },
+      { group: "E", match: 74, slot: "away" },
+      { group: "G", match: 82, slot: "away" },
+      { group: "I", match: 77, slot: "away" },
+      { group: "K", match: 87, slot: "away" },
+      { group: "L", match: 80, slot: "away" }
+    ];
+
+    const p = findValidPermutation(groupWinners.map(gw => gw.group), qualified);
+    if (p) {
+      groupWinners.forEach((gw, idx) => {
+        const team = qualified[p[idx]];
+        matchState[gw.match][gw.slot] = team.name;
+      });
+    }
   }
 
   // ── Knockout Bracket ────────────────────────────────────────────────────
@@ -582,8 +681,16 @@
   function init() {
     initState();
     autoFillR32();
+    autoFillBestThirds();
+    autoFillKnockouts();
     renderGroupTables();
     renderBracket();
+    if (typeof window.renderSchedule === "function") {
+      window.renderSchedule();
+    }
+    if (typeof window.renderCountdowns === "function") {
+      window.renderCountdowns();
+    }
   }
 
   init();
@@ -595,8 +702,16 @@
   function syncWallchart() {
     initState();
     autoFillR32();
+    autoFillBestThirds();
+    autoFillKnockouts();
     renderGroupTables();
     renderBracket();
+    if (typeof window.renderSchedule === "function") {
+      window.renderSchedule();
+    }
+    if (typeof window.renderCountdowns === "function") {
+      window.renderCountdowns();
+    }
   }
   window.syncWallchart = syncWallchart;
 

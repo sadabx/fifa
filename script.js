@@ -2,6 +2,16 @@ function etNow() {
   return new Date();
 }
 
+window.matchState = window.matchState || {};
+
+function getMatchTeam(matchId, side) {
+  if (window.matchState && window.matchState[matchId]) {
+    return window.matchState[matchId][side];
+  }
+  const m = MATCHES.find((x) => x.id === matchId);
+  return m ? m[side] : "";
+}
+
 let favorites = JSON.parse(localStorage.getItem("wc26_favs") || "[]");
 let stageFilter = "all";
 let pastExpanded = false;
@@ -68,9 +78,11 @@ function renderCountdowns() {
   const now = etNow();
   let cards = [];
   favorites.forEach((teamName) => {
-    const teamMatches = MATCHES.filter(
-      (m) => m.home === teamName || m.away === teamName,
-    );
+    const teamMatches = MATCHES.filter((m) => {
+      const homeResolved = getMatchTeam(m.id, "home") || m.home;
+      const awayResolved = getMatchTeam(m.id, "away") || m.away;
+      return homeResolved === teamName || awayResolved === teamName;
+    });
     const next = teamMatches.find((m) => {
       const status = getMatchStatus(m);
       return status === "upcoming" || status === "live";
@@ -81,7 +93,9 @@ function renderCountdowns() {
     const target = next || last;
     if (!target) return;
     const t = TEAMS.find((t) => t.name === teamName);
-    const opponent = target.home === teamName ? target.away : target.home;
+    const homeResolved = getMatchTeam(target.id, "home") || target.home;
+    const awayResolved = getMatchTeam(target.id, "away") || target.away;
+    const opponent = homeResolved === teamName ? awayResolved : homeResolved;
     const oppT = TEAMS.find((t) => t.name === opponent);
     const status = getMatchStatus(target);
     let timerHTML = "";
@@ -351,7 +365,9 @@ function renderSchedule() {
 }
 
 function matchRowHTML(m, isPast = false) {
-  const isFav = favorites.some((f) => f === m.home || f === m.away);
+  const homeResolved = getMatchTeam(m.id, "home") || m.home;
+  const awayResolved = getMatchTeam(m.id, "away") || m.away;
+  const isFav = favorites.some((f) => f === homeResolved || f === awayResolved);
   let cls = "match-row";
   if (isFav && !isPast) cls += " highlight";
   if (isPast) cls += " past-match";
@@ -367,7 +383,7 @@ function matchRowHTML(m, isPast = false) {
   else resultCell = `<div class="match-time">${formatMatchTime(m.date)}</div>`;
   return `<div class="${cls}">
     ${stageLabel}
-    <div class="match-teams">${m.home} <span>vs</span> ${m.away}</div>
+    <div class="match-teams">${homeResolved} <span>vs</span> ${awayResolved}</div>
     ${resultCell}
     <div class="match-venue">${m.venue || ""}</div>
   </div>`;
@@ -453,19 +469,23 @@ async function fetchScores() {
       const homeName = espnName(homeComp.team.displayName);
       const awayName = espnName(awayComp.team.displayName);
 
-      const match = MATCHES.find(
-        (m) =>
-          (m.home === homeName && m.away === awayName) ||
-          (m.home === awayName && m.away === homeName),
-      );
+      const match = MATCHES.find((m) => {
+        const homeResolved = getMatchTeam(m.id, "home") || m.home;
+        const awayResolved = getMatchTeam(m.id, "away") || m.away;
+        return (
+          (homeResolved === homeName && awayResolved === awayName) ||
+          (homeResolved === awayName && awayResolved === homeName)
+        );
+      });
       if (!match) return;
 
       const hScore = homeComp.score ?? "";
       const aScore = awayComp.score ?? "";
 
       if (isCompleted && hScore !== "" && aScore !== "") {
+        const homeResolved = getMatchTeam(match.id, "home") || match.home;
         const result =
-          match.home === homeName
+          homeResolved === homeName
             ? `${hScore}-${aScore}`
             : `${aScore}-${hScore}`;
         if (match.result !== result) {
@@ -474,8 +494,9 @@ async function fetchScores() {
           changed = true;
         }
       } else if (isLive && hScore !== "" && aScore !== "") {
+        const homeResolved = getMatchTeam(match.id, "home") || match.home;
         const liveScore =
-          match.home === homeName
+          homeResolved === homeName
             ? `${hScore}-${aScore}`
             : `${aScore}-${hScore}`;
         if (match.liveScore !== liveScore) {
@@ -507,3 +528,6 @@ async function fetchScores() {
 // Run immediately, then every 60 seconds
 fetchScores();
 setInterval(fetchScores, 60000);
+
+window.renderSchedule = renderSchedule;
+window.renderCountdowns = renderCountdowns;
